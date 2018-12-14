@@ -99,12 +99,7 @@ HANDLE getVolumeHandle(char volumeLetter)
     char sysNameBuf[MAX_PATH] = {0};
     int status = GetVolumeInformationA(volumeRootPath, NULL, 0, NULL, NULL, NULL, sysNameBuf, MAX_PATH);
 
-    if (0 != status) {
-        if (0 == strcmp(sysNameBuf, "NTFS")) {
-            isNTFS = true;
-        }
-    }
-    else {
+    if ((std::string(filesystem_name) != "NTFS") || (0 != status)) {
         throw std::system_error(GetLastError(), std::generic_category(), "GetVolumeInformation error");
     }
 
