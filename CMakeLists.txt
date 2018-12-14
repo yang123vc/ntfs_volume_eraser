@@ -9,6 +9,8 @@ set(BOOST_ROOT MY_BOOST_DIR)
 
 find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS program_options REQUIRED)
 
+include_directories(${Boost_INCLUDE_DIRS})
+
 add_executable(${TARGET} ntfs_journal.cpp command_line_parser.cpp command_line_parser.h)
 target_link_libraries(${TARGET} ${Boost_LIBRARIES})
 

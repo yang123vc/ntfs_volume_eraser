@@ -1,10 +1,16 @@
+#include "command_line_parser.h"
+
 #include <iostream>
 #include <map>
 #include <stack>
 #include <string>
 #include <Windows.h>
 
-using namespace std;
+static CommandLineParams& getCommandLineParam()
+{
+    static CommandLineParams p;
+    return p;
+}
 
 void enumerateNtfsFilesystem(HANDLE volumeHandle, USN nextUsn)
 {
@@ -109,11 +115,26 @@ HANDLE getVolumeHandle(char volumeLetter)
     return retHandle;
 }
 
-int main()
+void usage()
 {
-    bool useOverlapped = true;
-    bool enumerateNTFS = false;
+    std::cout << getCommandLineParam().optionsDescription() << '\n';
+    exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char* argv[])
+{
+    getCommandLineParam().readParams(argc, argv);
+
+    if (getCommandLineParam().isCmdLineHelp()) {
+        usage();
+    }
+
+    bool useOverlapped = getCommandLineParam().isUseOverlapped();
+    bool enumerateNTFS = getCommandLineParam().isEnumerateNtfs();
+    bool eraseJournal = getCommandLineParam().isEraseNtfs();
+    
     HANDLE volumeHandle = INVALID_HANDLE_VALUE;
+    char driveLetter = (getCommandLineParam().drive_letter().size()) ? getCommandLineParam().drive_letter()[0] : 'C';
 
     try{
         volumeHandle = getVolumeHandle('C');
@@ -145,7 +166,8 @@ int main()
     }
     
     DELETE_USN_JOURNAL_DATA deleteUsn;
-    if (useOverlapped) {
+    if (eraseJournal && useOverlapped) {
+
         deleteUsn.UsnJournalID = UsnInfo.UsnJournalID;
         deleteUsn.DeleteFlags = USN_DELETE_FLAG_DELETE | USN_DELETE_FLAG_NOTIFY;
         OVERLAPPED ov{};
@@ -159,7 +181,7 @@ int main()
 
         ::WaitForSingleObject(ov.hEvent, INFINITE);
     }
-    else {
+    else if (eraseJournal && !useOverlapped) {
         deleteUsn.UsnJournalID = UsnInfo.UsnJournalID;
         deleteUsn.DeleteFlags = USN_DELETE_FLAG_NOTIFY;
         success = DeviceIoControl(volumeHandle, FSCTL_DELETE_USN_JOURNAL, &deleteUsn, sizeof(deleteUsn), NULL, 0, &br, NULL);

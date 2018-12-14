@@ -4,8 +4,6 @@
 
 // The header contains command-line parser, uses Boost.ProgramOptions
 
-namespace panic {
-
 /**@brief Storage for all passed and default command-line params */
 class CommandLineParams {
 public:
@@ -14,45 +12,45 @@ public:
     CommandLineParams();
 
     /// @brief Parse raw command-line parameters
-    void read_params(int argc, char* argv[]);
+    void readParams(int argc, char* argv[]);
 
     /// @brief Set some logical param
-    void set_flag(const boost::program_options::variables_map& vm, bool& flag, const char* str);
+    void setFlag(const boost::program_options::variables_map& vm, bool& flag, const char* str);
 
     /// @brief Get available options list
-    boost::program_options::options_description& options_descript(){ return cmd_options_description; }
+    boost::program_options::options_description& optionsDescription(){ return cmdOptionsDescription; }
 
     //////////////////////////////////////////////////////////////////////////
     /// Accessors
 
     /// @brief Print command line help
-    bool is_help() const 
+    bool isCmdLineHelp() const 
     {
         return _help;
     }
 
-    /// @brief 
+    /// @brief Letter of drive which NTFS journal is opened
     const std::string& drive_letter() const 
     {
-        return _drive_letter;
+        return _driveLetter;
     }
 
-    /// @brief 
-    bool is_enumerate_ntfs() const 
+    /// @brief Enumerate NTFS filesystem journal
+    bool isEnumerateNtfs() const 
     {
-        return _enumerate_ntfs;
+        return _enumerateNtfs;
     }
 
-    /// @brief 
-    bool is_use_overlapped() const 
+    /// @brief Use asynchronous overlapped IO API during erasure
+    bool isUseOverlapped() const 
     {
-        return _use_overlapped;
+        return _useOverlapped;
     }
 
-    /// @brief 
-    bool is_erase_ntfs_journal() const 
+    /// @brief Erase NTFS filesystem journal
+    bool isEraseNtfs() const 
     {
-        return _erase_ntfs_journal;
+        return _eraseNtfsJournal;
     }
 
 private:
@@ -60,20 +58,18 @@ private:
     /// Show help
     bool _help = false;
 
-    /// 
-    std::string _drive_letter;
+    /// Letter of drive which NTFS journal is opened
+    std::string _driveLetter;
 
-    /// 
-    bool _enumerate_ntfs = false;
+    /// Enumerate NTFS filesystem journal
+    bool _enumerateNtfs = false;
 
-    /// 
-    bool _use_overlapped = false;
+    /// Use asynchronous overlapped IO API during erasure
+    bool _useOverlapped = false;
 
-    /// 
-    bool _erase_ntfs_journal = false;
+    /// Erase NTFS filesystem journal
+    bool _eraseNtfsJournal = false;
 
     /// Command-line params description
-    boost::program_options::options_description cmd_options_description;
+    boost::program_options::options_description cmdOptionsDescription;
 };
-
-} // namespace panic
