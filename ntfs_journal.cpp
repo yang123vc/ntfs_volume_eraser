@@ -145,9 +145,9 @@ int main(int argc, char* argv[])
         std::cerr << "ErrorCode = " << e.code() << '\n';
     }
 
-    DWORD br{};
+    DWORD bytesReturned{};
     CREATE_USN_JOURNAL_DATA usnJournalData = {};
-    BOOL success = DeviceIoControl(volumeHandle, FSCTL_CREATE_USN_JOURNAL, &usnJournalData, sizeof(usnJournalData), NULL, 0, &br, NULL);
+    BOOL success = DeviceIoControl(volumeHandle, FSCTL_CREATE_USN_JOURNAL, &usnJournalData, sizeof(usnJournalData), NULL, 0, &bytesReturned, NULL);
     if (FALSE == success) {
         std::cerr << "DeviceIoControl (FSCTL_CREATE_USN_JOURNAL) error code = " << GetLastError() << '\n';
         return 1;
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 
     bool getBasicInfoSuccess = false;
     USN_JOURNAL_DATA UsnInfo;
-    success = DeviceIoControl(volumeHandle, FSCTL_QUERY_USN_JOURNAL, NULL, 0, &UsnInfo, sizeof(UsnInfo), &br, NULL);
+    success = DeviceIoControl(volumeHandle, FSCTL_QUERY_USN_JOURNAL, NULL, 0, &UsnInfo, sizeof(UsnInfo), &bytesReturned, NULL);
     if (FALSE == success) {
         std::cerr << "DeviceIoControl (FSCTL_QUERY_USN_JOURNAL) error code = " << GetLastError() << '\n';
         return 1;
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
     else if (eraseJournal && !useOverlapped) {
         deleteUsn.UsnJournalID = UsnInfo.UsnJournalID;
         deleteUsn.DeleteFlags = USN_DELETE_FLAG_NOTIFY;
-        success = DeviceIoControl(volumeHandle, FSCTL_DELETE_USN_JOURNAL, &deleteUsn, sizeof(deleteUsn), NULL, 0, &br, NULL);
+        success = DeviceIoControl(volumeHandle, FSCTL_DELETE_USN_JOURNAL, &deleteUsn, sizeof(deleteUsn), NULL, 0, &bytesReturned, NULL);
 
         if (FALSE == success) {
             std::cerr << "DeviceIoControl (FSCTL_DELETE_USN_JOURNAL) error code = " << GetLastError() << '\n';
